@@ -1,0 +1,12 @@
+﻿{
+  "include": ["backend/app", "backend/tests"],
+  "exclude": ["infra", "tools", "mobile_flutter"],
+  "typeCheckingMode": "off",
+  "reportOperatorIssue": "none",
+  "reportAttributeAccessIssue": "none",
+  "reportArgumentType": "none",
+  "reportIndexIssue": "none",
+  "reportCallIssue": "none",
+  "reportGeneralTypeIssues": "none",
+  "reportMissingImports": "none"
+}
