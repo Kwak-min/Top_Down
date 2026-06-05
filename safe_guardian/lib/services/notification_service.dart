@@ -26,10 +26,6 @@ class NotificationService {
       channelDescription: '스미싱 위험 감지 알림',
       importance: Importance.max,
       priority: Priority.high,
-<<<<<<< HEAD
-=======
-      color: Color(0xFFC62828),
->>>>>>> 6ddcc6c101a73da16c16f46604675fd4ca04a30c
       enableVibration: true,
       playSound: true,
     );
@@ -52,10 +48,6 @@ class NotificationService {
       channelDescription: '안전한 문자 확인 알림',
       importance: Importance.defaultImportance,
       priority: Priority.defaultPriority,
-<<<<<<< HEAD
-=======
-      color: Color(0xFF2E7D32),
->>>>>>> 6ddcc6c101a73da16c16f46604675fd4ca04a30c
     );
 
     await _plugin.show(

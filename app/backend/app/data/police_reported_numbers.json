@@ -1,0 +1,17 @@
+{
+  "01000000000": {
+    "risk_level": "high",
+    "report_count": 42,
+    "reason": "가족 사칭 상품권 요구 신고"
+  },
+  "0215660000": {
+    "risk_level": "medium",
+    "report_count": 11,
+    "reason": "기관 사칭 링크 유도"
+  },
+  "01099998888": {
+    "risk_level": "high",
+    "report_count": 27,
+    "reason": "원격제어 앱 설치 유도"
+  }
+}

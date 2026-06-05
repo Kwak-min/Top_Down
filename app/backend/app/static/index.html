@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Topdown Guard</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ctext y='52' font-size='52'%3E🛡️%3C/text%3E%3C/svg%3E">
+  <style>
+    body{font-family:Arial,'Noto Sans KR',sans-serif;max-width:1120px;margin:30px auto;background:#f7fafc;color:#111;padding:0 16px}textarea,input{width:100%;font-size:20px;padding:12px;margin:8px 0;box-sizing:border-box}button,a.open-link{font-size:20px;padding:14px 18px;margin:8px 8px 8px 0;cursor:pointer;border-radius:12px;border:0;text-decoration:none;display:inline-block}.primary{background:#f6b73c;color:#1f2937;font-weight:800}.danger{background:#b91c1c;color:white;padding:20px;border-radius:12px;font-size:28px;font-weight:800}.card{background:white;padding:20px;border-radius:12px;margin:12px 0;box-shadow:0 2px 8px #ddd}pre{white-space:pre-wrap;background:#111;color:#0f0;padding:12px;overflow:auto}label{font-size:18px;font-weight:700}.browser-grid{display:grid;grid-template-columns:minmax(0,1fr)320px;gap:14px}.browser-frame{width:100%;height:440px;border:1px solid #ddd;border-radius:12px;background:white}.nanoclaw{border-radius:12px;padding:16px;background:#f3f4f6}.nanoclaw.safe{background:#dcfce7}.nanoclaw.caution{background:#fef3c7}.nanoclaw.danger{background:#fee2e2}.muted{color:#64748b;font-weight:700}@media(max-width:760px){.browser-grid{grid-template-columns:1fr}.browser-frame{height:360px}}
+  </style>
+</head>
+<body>
+  <h1>NanoClaw 웹 피싱 분석 서비스</h1>
+  <div class="card">
+    <h2>NanoClaw 웹 브라우저 분석</h2>
+    <label for="url">검사할 URL</label>
+    <input id="url" value="https://example.com" placeholder="https://example.com">
+    <button class="primary" onclick="openPage()">페이지 열기</button>
+    <button class="primary" onclick="analyzeUrl()">NanoClaw API 검사</button>
+    <a id="newtab" class="open-link" href="https://example.com" target="_blank" rel="noreferrer">새 탭에서 열기</a>
+    <div class="browser-grid">
+      <div>
+        <iframe id="webview" class="browser-frame" src="https://example.com" sandbox="allow-forms allow-same-origin allow-scripts allow-popups"></iframe>
+        <p class="muted">일부 사이트는 보안 정책 때문에 화면 안에서 열리지 않을 수 있습니다. 그 경우 새 탭을 사용하세요.</p>
+      </div>
+      <div id="nanoclaw" class="nanoclaw">
+        <h3>NanoClaw 판단</h3>
+        <p>URL을 입력하고 검사 버튼을 누르세요.</p>
+      </div>
+    </div>
+  </div>
+  <div id="alert"></div>
+  <script>
+    function normalizeUrl(value){
+      const trimmed=value.trim();
+      if(!trimmed) return '';
+      return /^https?:\/\//i.test(trimmed)?trimmed:'https://'+trimmed;
+    }
+    function openPage(){
+      const next=normalizeUrl(url.value);
+      if(!next) return;
+      url.value=next; webview.src=next; newtab.href=next;
+    }
+    function nanoclawClass(verdict){
+      if(verdict==='phishing') return 'nanoclaw danger';
+      if(verdict==='suspicious'||verdict==='unknown') return 'nanoclaw caution';
+      return 'nanoclaw safe';
+    }
+    async function postNanoclaw(payload){
+      const proxy=await fetch('/api/nanoclaw/analyze',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+      if(!proxy.ok) throw new Error('NanoClaw 프록시 API 실패: '+proxy.status+' (/api/nanoclaw/analyze)');
+      return await proxy.json();
+    }
+    async function analyzeUrl(){
+      openPage();
+      nanoclaw.className='nanoclaw';
+      nanoclaw.innerHTML='<h3>NanoClaw 판단</h3><p>분석 중입니다...</p>';
+      try{
+        const j=await postNanoclaw({url:url.value});
+        nanoclaw.className=nanoclawClass(j.verdict);
+        nanoclaw.innerHTML='<h3>NanoClaw 판단: '+(j.verdict||'unknown')+'</h3><p><b>신뢰도:</b> '+Math.round((j.confidence||0)*100)+'%</p><p>'+(j.reasoning||'판단 사유 없음')+'</p><pre>'+JSON.stringify(j.evidence_summary||{},null,2)+'</pre>';
+      }catch(e){
+        nanoclaw.className='nanoclaw caution';
+        nanoclaw.innerHTML='<h3>NanoClaw 판단: unknown</h3><p>'+(e instanceof Error?e.message:'NanoClaw 통신 실패')+'</p>';
+      }
+    }
+  </script>
+</body>
+</html>

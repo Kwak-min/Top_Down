@@ -36,11 +36,7 @@ class AppTheme {
           color: Colors.white,
         ),
       ),
-<<<<<<< HEAD
       cardTheme: CardThemeData(
-=======
-      cardTheme: CardTheme(
->>>>>>> 6ddcc6c101a73da16c16f46604675fd4ca04a30c
         color: cardBackground,
         elevation: 3,
         shadowColor: Colors.black26,
